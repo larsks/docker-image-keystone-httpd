@@ -15,6 +15,7 @@ RUN chown -R apache:apache /etc/keystone
 
 USER apache
 RUN keystone-manage db_sync
+RUN keystone-manage pki_setup
 
 USER root
 CMD /usr/sbin/httpd -DFOREGROUND
