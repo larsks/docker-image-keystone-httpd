@@ -5,23 +5,17 @@ RUN yum -y install openstack-keystone
 RUN mkdir -p /var/www/cgi-bin/keystone
 RUN ln /usr/share/keystone/keystone.wsgi /var/www/cgi-bin/keystone/main
 RUN ln /usr/share/keystone/keystone.wsgi /var/www/cgi-bin/keystone/admin
-RUN usermod -G keystone apache
-RUN chmod g+rwx /var/log/keystone
-RUN chmod g+s /var/log/keystone
 
 ADD wsgi-keystone.conf /etc/httpd/conf.d/wsgi-keystone.conf
 ADD keystone.conf /etc/keystone/keystone.conf
 
-RUN chgrp keystone /etc/keystone/keystone.conf
-RUN chmod g+rwx /var/lib/keystone
+RUN chown -R apache:apache /var/log/keystone
+RUN chown -R apache:apache /var/lib/keystone
+RUN chown -R apache:apache /etc/keystone
 
-USER keystone
+USER apache
 RUN keystone-manage db_sync
-USER root
-RUN chgrp keystone /var/lib/keystone/keystone.db
-RUN chmod g+rw /var/lib/keystone/keystone.db
-RUN chgrp keystone /var/log/keystone/keystone.log
-RUN chmod g+rw /var/log/keystone/keystone.log
 
+USER root
 CMD /usr/sbin/httpd -DFOREGROUND
 
